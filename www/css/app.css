@@ -1,0 +1,6 @@
+/* line 1, source/app.scss */
+#content-window {
+  padding: 25px;
+  margin: 25px;
+  border: solid 1px black;
+}

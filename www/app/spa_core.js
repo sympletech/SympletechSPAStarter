@@ -96,9 +96,9 @@
 
         self.currentPageState = state;
 
-        if (!page) {
-            self.loadPage(homePath, state);
-        } else if (self.currentPath != page) {
+        page = page ? page : homePath;
+
+        if (self.currentPath != page) {
             //Load the page
             $.get("app/views/" + page + ".html", function (data) {
                 self.currentPath = page;
@@ -109,13 +109,17 @@
                 if (vModel) {
                     self.bindViewModel(vModel);
                 }
+
+                var navigationEntry = _.findWhere(globalViewModel.navigation(), { path: page });
+                if (navigationEntry) {
+                    var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
+                    globalViewModel.pageTitle(pageTitle);
+                }
+
+
             });
         }
     };
-    //Fire it off on first pass (page load) and when hash changes
-    self.loadPageFromCurrentUrl();
-    
-
 
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);

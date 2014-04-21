@@ -114,6 +114,11 @@
                 if (navigationEntry) {
                     var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
                     globalViewModel.pageTitle(pageTitle);
+                    
+                    _.each(globalViewModel.navigation(), function (navEntry) {
+                        navEntry.active(navEntry.path == page);
+                    });
+
                 }
 
 

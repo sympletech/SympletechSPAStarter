@@ -12,17 +12,22 @@
 
 </head>
 <body>
-    
+
     <!--Navigation Bar-->
     <ul class="nav nav-tabs" data-bind="foreach:navigation">
-        <li data-bind="css:{'active' : false}"><a data-bind="html:text, click:$parent.loadNavigationPage"></a></li>
+        <li data-bind="css:{'active' : active}"><a data-bind="html:text, click:$parent.loadNavigationPage"></a></li>
     </ul>
 
-    
+    <!--Content Panel-->
+    <div class="panel panel-default content-wrapper">
+        <div class="panel-heading">
+            <h3 class="panel-title" data-bind="html : pageTitle"></h3>
+        </div>
+        <div id="content-window" class="panel-body">
+            Panel content
+        </div>
+    </div>
 
-    <h1 data-bind="html : pageTitle"></h1>
-
-    <div id="content-window"></div>
 
     <!--Vendor Scripts-->
     <script src="lib/jquery-1.11.0.min.js"></script>
@@ -36,15 +41,12 @@
 
     <!--Global Application Scripts-->
     <script src="app/spa_core.js"></script>
+    <script src="app/view-models/_globalViewModel.js"></script>
 
     <!--View Models-->
-    <script src="app/view-models/_globalViewModel.js"></script>
     <script src="app/view-models/login-viewmodel.js"></script>
     <script src="app/view-models/home-viewmodel.js"></script>
-    
-    <script type="text/javascript">
-        Core.loadPageFromCurrentUrl();
-    </script>
+
 
 </body>
 </html>

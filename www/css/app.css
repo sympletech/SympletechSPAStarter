@@ -1,6 +1,15 @@
 /* line 1, source/app.scss */
+.nav-tabs li {
+  cursor: pointer;
+}
+
+/* line 5, source/app.scss */
+.content-wrapper {
+  margin: 25px;
+}
+
+/* line 9, source/app.scss */
 #content-window {
   padding: 25px;
   margin: 25px;
-  border: solid 1px black;
 }

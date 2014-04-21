@@ -10,8 +10,8 @@
     });
 
     self.navigation = ko.observableArray([
-        {text : 'Home Page', title : 'SPA Starter', path : 'home'},
-        { text: 'Login Page', title: 'Login Page', path: 'login' }
+        { text: 'Home Page', title: 'SPA Starter', path: 'home', active: ko.observable(false) },
+        { text: 'Login Page', title: 'Login Page', path: 'login', active: ko.observable(false) }
     ]);
 
     self.loadNavigationPage = function (page) {
@@ -25,3 +25,4 @@
 
 
 ko.applyBindings(globalViewModel);
+Core.loadPageFromCurrentUrl();

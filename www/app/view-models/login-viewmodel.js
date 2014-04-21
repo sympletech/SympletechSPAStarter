@@ -1,7 +1,17 @@
 ﻿var loginViewModel = function () {
     var self = this;
 
-    self.loginMessage = ko.observable("login Message");
+    self.username = ko.observable();
+    self.password = ko.observable();
+    self.rememberMe = ko.observable();
+
+    self.attemptLogin = function () {
+        Core.loginUser({
+            username: self.username(),
+            rememberMe: self.rememberMe()
+        });
+    };
+
 
     return self;
 };

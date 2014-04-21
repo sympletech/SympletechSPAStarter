@@ -23,6 +23,8 @@
 
         $.cookie(authCookieName, self.currentUser, { expires: expires });
 
+        globalViewModel.currentUser(userDetails.username);
+
         //Check to see if there was a redirect 
         self.loadPage(homePath);
     };
@@ -30,7 +32,8 @@
     self.logoutUser = function () {
         self.currentUser = null;
         $.removeCookie(authCookieName);
-
+        globalViewModel.currentUser(null);
+        
         self.loadPage(loginPath);
     };
 

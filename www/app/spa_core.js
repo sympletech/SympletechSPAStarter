@@ -1,6 +1,8 @@
 ﻿var Core = new (function () {
     var self = this;
-    
+
+    self.apiUrl = '';
+
     var $ContentWindow = $("#content-window"),
         loginPath = 'login',
         homePath = 'home';
@@ -92,11 +94,12 @@
 
         if (state) {
             try {
+                state = unescape(state);
                 state = JSON.parse(state);
             } catch(e) {
             }
         }
-
+	
         self.currentPageState = state;
 
         page = page ? page : homePath;
@@ -123,8 +126,6 @@
                     });
 
                 }
-
-
             });
         }
     };
@@ -159,15 +160,19 @@
             params = $.extend({ token: self.currentUser.token }, params);
         }
 
+        if (self.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
+            endpoint = endpoint.substring(1, endpoint.length);
+        }
+
         $.ajax({
-            url: endpoint,
+            url: self.apiUrl + endpoint,
             type: method,
             data: params,
             success: function (data) {
                 if (data.success == true) {
                     onSuccess(data.data);
                 } else {
-                    $c.logit("Error : " + data.errorMessage);
+                    logit("Error : " + data.errorMessage);
                     onFail(data.errorMessage);
                 }
             },
@@ -175,7 +180,7 @@
                 if (jqXHR.status == 403) {
                     self.loadPage(loginPath);
                 } else {
-                    $c.logit("Error : " + errorThrown);
+                    logit("Error : " + errorThrown);
                     onFail(errorThrown);
                 }
             }

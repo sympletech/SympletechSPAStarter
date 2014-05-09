@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\templates\login-template.html" />
     <Content Include="app\view-models\home-viewmodel.js" />
     <Content Include="app\view-models\_globalViewModel.js" />
     <Content Include="app\views\home.html" />
@@ -96,7 +97,11 @@
     <Content Include="lib\jquery-1.11.0.min.js" />
     <Content Include="lib\jquery.cookie.js" />
     <Content Include="lib\knockout-3.1.0.js" />
+    <Content Include="lib\knockout-view-model\knockout.viewmodel.js" />
+    <Content Include="lib\knockout-view-model\knockout.viewmodel.min.js" />
+    <Content Include="lib\q.js" />
     <Content Include="lib\underscore-min.js" />
+    <Content Include="app-routes.js" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

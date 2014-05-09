@@ -35,7 +35,7 @@
         self.currentUser = null;
         $.removeCookie(authCookieName);
         globalViewModel.currentUser(null);
-        
+
         self.loadPage(loginPath);
     };
 
@@ -69,20 +69,34 @@
         $COMMIT();
     };
 
-    self.loadTemplates = function (templates, done) {
-        var templateContainer = $("#template-container");
+    var templateContainer = $("#template-container");
+    self.loadTemplates = function (templates) {
+        var deferred = Q.defer();
+
         templateContainer.html("");
         if (templates) {
-            _.each(templates, function(template) {
-                $.get('app/templates/' + template + '.html', function(data) {
-                    templateContainer.append(data);
-                    done();
-                    //todo: Add Q
-                });
+            var promises = [];
+            _.each(templates, function (template) {
+                promises.push(self.getTemplate(template));
+            });
+            Q.all(promises).spread(function (results) {
+                deferred.resolve();
             });
         } else {
-            done();
+            deferred.resolve();
         }
+
+        return deferred.promise;
+    };
+
+    self.getTemplate = function (template) {
+        var d = Q.defer();
+
+        $.get('app/templates/' + template + '.html', function (data) {
+            templateContainer.append(data);
+            d.resolve(template);
+        });
+        return d.promise;
     };
 
     self.setPageState = function (pageState, defer) {
@@ -112,23 +126,23 @@
             try {
                 state = unescape(state);
                 state = JSON.parse(state);
-            } catch(e) {
+            } catch (e) {
             }
         }
-	
+
         self.currentPageState = state;
 
         if (!page) {
             self.loadPage(homePath, state);
         } else if (self.currentPath != page) {
             var navigationEntry = _.findWhere(appRoutes, { path: page });
-            self.loadTemplates(navigationEntry.templates, function () {
+            self.loadTemplates(navigationEntry.templates).then(function () {
                 self.loadPageHtml(navigationEntry);
             });
         }
     };
 
-    
+
     self.loadPageHtml = function (navigationEntry) {
         //Load the page
         $.get("app/views/" + navigationEntry.path + ".html", function (data) {
@@ -140,7 +154,7 @@
             if (vModel) {
                 self.bindViewModel(vModel);
             }
-            
+
             var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
             globalViewModel.pageTitle(pageTitle);
 
@@ -159,8 +173,8 @@
     //************************************************
     // API Methods
     //************************************************
-    
-    
+
+
     self.apiGet = function (endpoint, params, onSuccess, onFail) {
         return self.apiAjaxRequest("GET", endpoint, params, onSuccess, onFail);
     };

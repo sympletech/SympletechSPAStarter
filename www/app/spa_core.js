@@ -102,9 +102,9 @@
 	
         self.currentPageState = state;
 
-        page = page ? page : homePath;
-
-        if (self.currentPath != page) {
+        if (!page) {
+            self.loadPage(homePath, state);
+        } else if (self.currentPath != page) {
             //Load the page
             $.get("app/views/" + page + ".html", function (data) {
                 self.currentPath = page;
@@ -129,6 +129,10 @@
             });
         }
     };
+    //Fire it off on first pass (page load) and when hash changes
+    self.loadPageFromCurrentUrl();
+    
+
 
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);

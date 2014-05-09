@@ -69,6 +69,22 @@
         $COMMIT();
     };
 
+    self.loadTemplates = function (templates, done) {
+        var templateContainer = $("#template-container");
+        templateContainer.html("");
+        if (templates) {
+            _.each(templates, function(template) {
+                $.get('app/templates/' + template + '.html', function(data) {
+                    templateContainer.append(data);
+                    done();
+                    //todo: Add Q
+                });
+            });
+        } else {
+            done();
+        }
+    };
+
     self.setPageState = function (pageState, defer) {
         if (pageState) {
             $SET("@s", encodeURI(JSON.stringify(pageState)), { defer: defer });
@@ -105,34 +121,34 @@
         if (!page) {
             self.loadPage(homePath, state);
         } else if (self.currentPath != page) {
-            //Load the page
-            $.get("app/views/" + page + ".html", function (data) {
-                self.currentPath = page;
-                $ContentWindow.html(data);
-
-                var vModel;
-                eval('vModel = ' + page + 'ViewModel;');
-                if (vModel) {
-                    self.bindViewModel(vModel);
-                }
-
-                var navigationEntry = _.findWhere(globalViewModel.navigation(), { path: page });
-                if (navigationEntry) {
-                    var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
-                    globalViewModel.pageTitle(pageTitle);
-                    
-                    _.each(globalViewModel.navigation(), function (navEntry) {
-                        navEntry.active(navEntry.path == page);
-                    });
-
-                }
+            var navigationEntry = _.findWhere(appRoutes, { path: page });
+            self.loadTemplates(navigationEntry.templates, function () {
+                self.loadPageHtml(navigationEntry);
             });
         }
     };
-    //Fire it off on first pass (page load) and when hash changes
-    self.loadPageFromCurrentUrl();
-    
 
+    
+    self.loadPageHtml = function (navigationEntry) {
+        //Load the page
+        $.get("app/views/" + navigationEntry.path + ".html", function (data) {
+            self.currentPath = navigationEntry.path;
+            $ContentWindow.html(data);
+
+            var vModel;
+            eval('vModel = ' + navigationEntry.path + 'ViewModel;');
+            if (vModel) {
+                self.bindViewModel(vModel);
+            }
+            
+            var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
+            globalViewModel.pageTitle(pageTitle);
+
+            _.each(globalViewModel.navigation(), function (navEntry) {
+                navEntry.active(navEntry.path == navigationEntry.path);
+            });
+        });
+    };
 
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);
@@ -192,4 +208,9 @@
     };
 
     return self;
+})();
+
+$(function () {
+    //Fire it off on first pass (page load) and when hash changes
+    Core.loadPageFromCurrentUrl();
 });

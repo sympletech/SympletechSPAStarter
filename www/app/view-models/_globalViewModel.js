@@ -15,10 +15,18 @@
     //************************************************
     // Navigation
     //************************************************
-    self.navigation = ko.observableArray([
-        { text: 'Home Page', title: 'SPA Starter', path: 'home', active: ko.observable(false) },
-        { text: 'Login Page', title: 'Login Page', path: 'login', active: ko.observable(false) }
-    ]);
+    var NavigationEntry = function (route) {
+        this.text = route.text;
+        this.title = route.title;
+        this.path = route.path;
+        this.templates = route.templates;
+        this.active = ko.observable(false);
+    };
+
+    self.navigation = ko.observableArray();
+    _.each(appRoutes, function (route) {
+        self.navigation.push(new NavigationEntry(route));
+    });
 
     self.loadNavigationPage = function (page) {
         self.pageTitle(self.basePageTitle + " " + page.title);

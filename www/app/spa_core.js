@@ -198,8 +198,13 @@
             endpoint = endpoint.substring(1, endpoint.length);
         }
 
+        var requestPath = apiUrl + endpoint;
+
+        requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';
+        requestPath += 'z=' + new Date().getTime();		
+		
         $.ajax({
-            url: self.apiUrl + endpoint,
+            url: requestPath,
             type: method,
             data: params,
             success: function (data) {

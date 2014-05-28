@@ -169,6 +169,18 @@
         ko.applyBindings(new vModel(), $ContentWindow[0]);
     };
 
+    //************************************************
+    // Loader Methods
+    //************************************************
+
+    self.showLoader = function () {
+        $("#loader").fadeIn();
+    };
+
+    self.hideLoader = function () {
+        $("#loader").fadeOut();
+    };
+
 
     //************************************************
     // API Methods
@@ -189,6 +201,8 @@
     };
 
     self.apiAjaxRequest = function (method, endpoint, params, onSuccess, onFail) {
+        self.showLoader();
+        
         self.currentUser = self.getCurrentUser();
         if (self.currentUser) {
             params = $.extend({ token: self.currentUser.token }, params);
@@ -214,6 +228,7 @@
                     logit("Error : " + data.errorMessage);
                     onFail(data.errorMessage);
                 }
+                self.hideLoader();
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 403) {
@@ -222,6 +237,7 @@
                     logit("Error : " + errorThrown);
                     onFail(errorThrown);
                 }
+                self.hideLoader();
             }
         });
     };

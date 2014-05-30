@@ -1,7 +1,7 @@
 ﻿var Core = new (function () {
     var self = this;
 
-    self.apiUrl = '';
+    var apiUrl = AppSettings.apiUrl;
 
     var $ContentWindow = $("#content-window"),
         loginPath = 'login',

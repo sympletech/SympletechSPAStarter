@@ -223,10 +223,14 @@
             data: params,
             success: function (data) {
                 if (data.success == true) {
-                    onSuccess(data.data);
+                    if(onSuccess){
+						onSuccess(data.data);
+					}
                 } else {
                     logit("Error : " + data.errorMessage);
-                    onFail(data.errorMessage);
+					if(onFail){
+						onFail(data.errorMessage);
+					}
                 }
                 self.hideLoader();
             },
@@ -235,7 +239,9 @@
                     self.loadPage(loginPath);
                 } else {
                     logit("Error : " + errorThrown);
-                    onFail(errorThrown);
+					if(onFail){
+						onFail(errorThrown);
+					}
                 }
                 self.hideLoader();
             }

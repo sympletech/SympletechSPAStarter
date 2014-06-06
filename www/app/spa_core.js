@@ -24,6 +24,7 @@ var Core = new (function () {
         }
         self.activeEnvironment = activeEnvironment;
     };
+    self.loadActiveEnvironment();
     
     //************************************************
     // ViewModel Loads
@@ -238,12 +239,12 @@ var Core = new (function () {
         }
 
         var requestPath = endpoint;
-        if (AppSettings.apiUrl) {
-            if (AppSettings.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
+        if (self.activeEnvironment.apiUrl) {
+            if (self.activeEnvironment.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
                 endpoint = endpoint.substring(1, endpoint.length);
             }
 
-            requestPath = AppSettings.apiUrl + endpoint;
+            requestPath = self.activeEnvironment.apiUrl + endpoint;
         }
 
         requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';

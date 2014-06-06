@@ -100,10 +100,19 @@
     <Content Include="lib\knockout-view-model\knockout.viewmodel.js" />
     <Content Include="lib\knockout-view-model\knockout.viewmodel.min.js" />
     <Content Include="lib\q.js" />
+    <Content Include="lib\sammy-latest.min.js" />
     <Content Include="lib\underscore-min.js" />
     <Content Include="app-routes.js" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="css\scss\app.scss">
+      <Compile>False</Compile>
+      <Minify>True</Minify>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </Content>
+    <Content Include="css\scss\_toolbox.scss" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="lib\bootstrap\fonts\glyphicons-halflings-regular.ttf" />
@@ -111,14 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\view-models\login-viewmodel.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="css\source\app.scss">
-      <Compile>False</Compile>
-      <Minify>False</Minify>
-      <CompileStyle>Nested</CompileStyle>
-      <DebugInfo>False</DebugInfo>
-    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

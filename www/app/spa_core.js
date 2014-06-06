@@ -250,8 +250,3 @@
 
     return self;
 })();
-
-$(function () {
-    //Fire it off on first pass (page load) and when hash changes
-    Core.loadPageFromCurrentUrl();
-});

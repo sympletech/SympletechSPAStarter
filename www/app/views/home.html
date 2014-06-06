@@ -1,31 +1,22 @@
-﻿<div class="home-page">
-    
-    <div class="row">
-        <div class="col-lg-10">
-            <h2>Documentation</h2>
-            <p>Coming Soon...</p>
-        </div>
-        <div class="col-lg-2">
+﻿<div class="row">
+    <div class="col-lg-10">
+        <h2>Documentation</h2>
+        <p>Coming Soon...</p>
+    </div>
+    <div class="col-lg-2">
             
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title" data-bind="html:(currentUser() ? 'current user : ' + currentUser().username : 'No User Logged In')"></h3>
-                </div>
-                <div class="panel-body text-center">
-                    
-                    <button data-bind="visible:!currentUser(), click:loadLoginPage" class="btn btn-primary">Login</button>
-                    <button data-bind="visible:currentUser, click:logoutUser" class="btn btn-primary">LogOut</button>
-                    
-                    <button class="btn btn-danger">Load Secure Page</button>
-
-                </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title" data-bind="html:(currentUser() ? 'current user : ' + currentUser().username : 'No User Logged In')"></h3>
             </div>
-            
+            <div class="panel-body text-center">
+                    
+                <button data-bind="visible:!currentUser(), click:loadLoginPage" class="btn btn-primary">Login</button>
+                <button data-bind="visible:currentUser, click:logoutUser" class="btn btn-primary">LogOut</button>
+                    
+                <button data-bind="click:loadSecurePage" class="btn btn-danger">Load Secure Page</button>
 
+            </div>
         </div>
     </div>
-    
-
-
 </div>
-

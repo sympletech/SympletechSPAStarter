@@ -27,14 +27,17 @@ var AppSettings = (function() {
     self.appRoutes = [
         {
             path: 'home',
-            text: 'Home Page',
             title: 'Home Page'
         },
         {
             path: 'login',
-            text: 'Login Page',
             title: 'Login Page',
             templates: ['login-template']
+        },
+        {
+            path: 'secure',
+            title: 'Secure Page',
+            secure : true
         }
     ];    
 

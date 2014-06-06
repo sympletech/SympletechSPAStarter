@@ -78,13 +78,10 @@ var Core = new (function () {
     self.currentPageState = null;
 
     //Loads Specified path's content into Content Window protects paths if no user is logged in
-    self.loadPage = function (path, state, securedPage) {
+    self.loadPage = function (path, state) {
 
         //Set current Path
         path = path ? path : AppSettings.defaultRoute;
-        if (securedPage == true) {
-            path = (self.getCurrentUser() != null) ? path : AppSettings.securedRedirect;
-        }
         $SET("@p", path, { defer: true });
 
         self.setPageState(state, true);
@@ -161,9 +158,16 @@ var Core = new (function () {
             self.loadPage(AppSettings.defaultRoute, state);
         } else if (self.currentPath != page) {
             var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: page });
-            self.loadTemplates(navigationEntry.templates).then(function () {
-                self.loadPageHtml(navigationEntry);
-            });
+
+            if (navigationEntry.secure && self.currentUser == null) {
+                self.loadPage(AppSettings.securedRedirect);
+            } else {
+                self.loadTemplates(navigationEntry.templates).then(function() {
+                    self.loadPageHtml(navigationEntry);
+                });
+            }
+
+
         }
     };
 

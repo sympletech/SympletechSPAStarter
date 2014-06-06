@@ -10,5 +10,9 @@
         Core.logoutUser();
     };
 
+    self.loadSecurePage = function () {
+        Core.loadPage('secure');
+    };
+
     return self;
 };

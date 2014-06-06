@@ -60,12 +60,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app-settings.js" />
     <Content Include="app\templates\login-template.html" />
     <Content Include="app\view-models\home-viewmodel.js" />
     <Content Include="app\view-models\_globalViewModel.js" />
     <Content Include="app\views\home.html" />
     <Content Include="app\views\login.html" />
     <Content Include="css\app.css" />
+    <Content Include="img\loader-thingy.gif" />
     <Content Include="index.html" />
     <Content Include="app\spa_core.js" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.css" />
@@ -100,7 +102,6 @@
     <Content Include="lib\knockout-view-model\knockout.viewmodel.js" />
     <Content Include="lib\knockout-view-model\knockout.viewmodel.min.js" />
     <Content Include="lib\q.js" />
-    <Content Include="lib\sammy-latest.min.js" />
     <Content Include="lib\underscore-min.js" />
     <Content Include="app-routes.js" />
   </ItemGroup>

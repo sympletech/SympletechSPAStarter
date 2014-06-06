@@ -1,13 +1,23 @@
 ﻿var Core = new (function () {
     var self = this;
 
-    var apiUrl = AppSettings.apiUrl;
-
     var $ContentWindow = $("#content-window"),
         loginPath = 'login',
         homePath = 'home';
 
     $c.DEBUG_MODE = false;
+
+    //************************************************
+    // ViewModel Loads
+    //************************************************
+    self.loadViewModels = function () {
+        var includes = '';
+        _.each(appRoutes, function (route) {
+            includes += '<script type="text/javascript" src="app/view-models/' + route.path + '-viewmodel.js"></script>';
+        });
+        document.write(includes);
+    };
+    self.loadViewModels();
 
     //************************************************
     // Current User Management
@@ -186,7 +196,6 @@
     // API Methods
     //************************************************
 
-
     self.apiGet = function (endpoint, params, onSuccess, onFail) {
         return self.apiAjaxRequest("GET", endpoint, params, onSuccess, onFail);
     };
@@ -212,7 +221,7 @@
             endpoint = endpoint.substring(1, endpoint.length);
         }
 
-        var requestPath = apiUrl + endpoint;
+        var requestPath = AppSettings.apiUrl + endpoint;
 
         requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';
         requestPath += 'z=' + new Date().getTime();		

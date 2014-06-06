@@ -3,6 +3,9 @@ var AppSettings = (function() {
 
     self.applicationTitle = "Sympletech SPA Starter";
 
+    //************************************************
+    // Environments
+    //************************************************    
     self.defaultEnvironment = 'dev';
     self.environments = [
         {
@@ -22,6 +25,9 @@ var AppSettings = (function() {
         }
     ];
     
+    //************************************************
+    // Routes
+    //************************************************   
     self.defaultRoute = 'home';
     self.securedRedirect = 'login';
     self.appRoutes = [

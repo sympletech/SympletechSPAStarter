@@ -237,11 +237,14 @@ var Core = new (function () {
             params = $.extend({ token: self.currentUser.token }, params);
         }
 
-        if (self.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
-            endpoint = endpoint.substring(1, endpoint.length);
-        }
+        var requestPath = endpoint;
+        if (AppSettings.apiUrl) {
+            if (AppSettings.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
+                endpoint = endpoint.substring(1, endpoint.length);
+            }
 
-        var requestPath = AppSettings.apiUrl + endpoint;
+            requestPath = AppSettings.apiUrl + endpoint;
+        }
 
         requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';
         requestPath += 'z=' + new Date().getTime();		

@@ -2,3 +2,5 @@
 /.sass-cache
 /.JustCode
 grunt-tasks/.sass-cache
+/www/bin
+/www/obj

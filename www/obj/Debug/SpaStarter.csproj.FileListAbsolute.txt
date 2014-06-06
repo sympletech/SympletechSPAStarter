@@ -1,5 +1,0 @@
-C:\Users\dani0002\Documents\Visual Studio 2013\Projects\SpaStarter\www\bin\SpaStarter.dll
-C:\Users\dani0002\Documents\Visual Studio 2013\Projects\SpaStarter\www\bin\SpaStarter.pdb
-C:\Users\dani0002\Documents\Visual Studio 2013\Projects\SpaStarter\www\obj\Debug\SpaStarter.csprojResolveAssemblyReference.cache
-C:\Users\dani0002\Documents\Visual Studio 2013\Projects\SpaStarter\www\obj\Debug\SpaStarter.dll
-C:\Users\dani0002\Documents\Visual Studio 2013\Projects\SpaStarter\www\obj\Debug\SpaStarter.pdb

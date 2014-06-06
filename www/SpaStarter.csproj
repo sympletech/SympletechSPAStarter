@@ -102,7 +102,6 @@
     <Content Include="lib\knockout-view-model\knockout.viewmodel.min.js" />
     <Content Include="lib\q.js" />
     <Content Include="lib\underscore-min.js" />
-    <Content Include="app-routes.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\scss\app.scss">

@@ -62,7 +62,7 @@ var Core = new (function () {
         self.currentUser = null;
         $.removeCookie(authCookieName);
 
-        self.loadPage(AppSettings.securedRedirect);
+        window.location.href = window.location.href.split('#')[0];
     };
 
     self.getCurrentUser = function () {

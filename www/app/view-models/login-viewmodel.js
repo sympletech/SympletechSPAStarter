@@ -6,12 +6,8 @@
     self.rememberMe = ko.observable();
 
     self.attemptLogin = function () {
-        Core.loginUser({
-            username: self.username(),
-            rememberMe: self.rememberMe()
-        });
+        Core.loginUser({username: self.username()}, self.rememberMe());
     };
-
 
     return self;
 };

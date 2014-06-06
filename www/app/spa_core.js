@@ -49,15 +49,13 @@ var Core = new (function () {
     var authCookieName = "userinfo";
 
     $.cookie.json = true;
-    self.loginUser = function (userDetails) {
+    self.loginUser = function (userDetails, rememberUser) {
         self.currentUser = userDetails;
 
         //Set Current User cookie
-        var expires = (userDetails.rememberMe == true) ? 7 : 1;
+        var expires = rememberUser ? 365 : 1;
 
         $.cookie(authCookieName, self.currentUser, { expires: expires });
-
-        globalViewModel.currentUser(userDetails.username);
 
         //Check to see if there was a redirect 
         self.loadPage(homePath);
@@ -66,7 +64,6 @@ var Core = new (function () {
     self.logoutUser = function () {
         self.currentUser = null;
         $.removeCookie(authCookieName);
-        globalViewModel.currentUser(null);
 
         self.loadPage(loginPath);
     };

@@ -1,4 +1,12 @@
 ﻿<div class="home-page">
     <h3 data-bind="html:welcomeMessage"></h3>
+    
+
+    <button data-bind="visible:!currentUser(), click:loadLoginPage" class="btn btn-primary">Load Login Page</button>
+    
+    <div data-bind="visible:currentUser">
+        <label>Current User :</label><b data-bind="html:currentUser().username"></b><br/>
+        <button data-bind="click:logoutUser" class="btn btn-primary">LogOut</button>
+    </div>
 </div>
 

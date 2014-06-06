@@ -1,14 +1,15 @@
+@import 'toolbox';
+
+$border-radus : 5px;
+
 #loader{
 	background: #fff;
-	@include opacity(0.75);
-	position:absolute;
 	z-index:9999;
-	top:0;
-	left:0;
-	right:0;
-	bottom:0;
 	text-align: center;
 	display : none;
+
+	@include opacity(0.75);
+	@include absolute-fill();
 
 	img{
 		padding-top: 450px;
@@ -16,7 +17,8 @@
 	}
 }
 .nav-tabs li{
-	cursor:pointer;
+	border:solid 1px $border-radus;
+	cursor:pointer; 
 }
 
 .content-wrapper{

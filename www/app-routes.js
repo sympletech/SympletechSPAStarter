@@ -1,4 +1,13 @@
 ﻿var appRoutes = [
-    { text: 'Home Page', title: 'SPA Starter', path: 'home' },
-    { text: 'Login Page', title: 'Login Page', path: 'login', templates: ['login-template'] }
+    {
+        path: 'home',
+        text: 'Home Page',
+        title: 'SPA Starter'
+    },
+    {
+        path: 'login',
+        text: 'Login Page',
+        title: 'Login Page',
+        templates: ['login-template']
+    }
 ];

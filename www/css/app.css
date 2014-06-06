@@ -1,14 +1,39 @@
-/* line 1, source/app.scss */
+/* ----------------------------------------------------
+ Vendor Prefix Mixins
+--------------------------------------------------- */
+/* line 5, scss/app.scss */
+#loader {
+  background: #fff;
+  z-index: 9999;
+  text-align: center;
+  display: none;
+  -moz-opacity: 0.75;
+  -khtml-opacity: 0.75;
+  opacity: 0.75;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+/* line 14, scss/app.scss */
+#loader img {
+  padding-top: 450px;
+  width: 100px;
+}
+
+/* line 19, scss/app.scss */
 .nav-tabs li {
+  border: solid 1px 5px;
   cursor: pointer;
 }
 
-/* line 5, source/app.scss */
+/* line 24, scss/app.scss */
 .content-wrapper {
   margin: 25px;
 }
 
-/* line 9, source/app.scss */
+/* line 28, scss/app.scss */
 #content-window {
   padding: 25px;
   margin: 25px;

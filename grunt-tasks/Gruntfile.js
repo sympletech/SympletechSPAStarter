@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 		
 		watch:{
 			sass:{
-				files:['../www/css/source/**/*.scss'],
+				files:['../www/css/scss/**/*.scss'],
 				tasks: ['compass']
 			}
 		},
@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 		compass: {
 		  sass: {
 			options: {
-				sassDir: '../www/css/source/',
+				sassDir: '../www/css/scss/',
 				cssDir: '../www/css/',
 				//environment: 'production',
 				//outputStyle: 'compressed'

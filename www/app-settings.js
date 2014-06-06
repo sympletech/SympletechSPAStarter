@@ -1,7 +1,8 @@
-﻿var AppSettings = (function() {
-    var defaultEnvironment = 'dev';
-
-    var environments = [
+var AppSettings = (function() {
+    var self = this;
+    
+    self.defaultEnvironment = 'dev';
+    self.environments = [
         {
             name: 'local',
             apiUrl: location.hostname + '/api/',
@@ -18,20 +19,22 @@
             hostnames: ['my.prdserver.com']
         }
     ];
+    
+    self.defaultRoute = 'home';
+    self.securedRedirect = 'login';
+    self.appRoutes = [
+        {
+            path: 'home',
+            text: 'Home Page',
+            title: 'SPA Starter'
+        },
+        {
+            path: 'login',
+            text: 'Login Page',
+            title: 'Login Page',
+            templates: ['login-template']
+        }
+    ];    
 
-
-    var activeEnvironment = _.find(environments, function (env) {
-        return env.hostnames.contains(location.hostname);
-    });
-
-    var env = $GET('env');
-    if (env) {
-        defaultEnvironment = env;
-    }
-
-    if (activeEnvironment == null || env) {
-        activeEnvironment = _.findWhere(environments, { name: defaultEnvironment });
-    }
-
-    return activeEnvironment;
+    return self;
 })();

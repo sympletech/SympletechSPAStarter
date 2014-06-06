@@ -122,6 +122,9 @@
   <ItemGroup>
     <Content Include="app\view-models\login-viewmodel.js" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="app\views\jade\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -1,4 +1,4 @@
-﻿var Core = new (function () {
+var Core = new (function () {
     var self = this;
 
     var $ContentWindow = $("#content-window"),
@@ -8,16 +8,38 @@
     $c.DEBUG_MODE = false;
 
     //************************************************
+    // Active Environment
+    //************************************************    
+    self.activeEnvironment = null;
+    self.loadActiveEnvironment = function(){
+        
+        var activeEnvironment = _.find(AppSettings.environments, function (env) {
+            return env.hostnames.contains(location.hostname);
+        });
+
+        var env = $GET('env');
+        if (env) {
+            AppSettings.defaultEnvironment = env;
+        }           
+
+        if (activeEnvironment == null || env) {
+            activeEnvironment = _.findWhere(environments, { name: defaultEnvironment });
+        }
+        self.activeEnvironment = activeEnvironment;
+    };
+    
+    //************************************************
     // ViewModel Loads
     //************************************************
     self.loadViewModels = function () {
         var includes = '';
-        _.each(appRoutes, function (route) {
+        _.each(AppSettings.appRoutes, function (route) {
             includes += '<script type="text/javascript" src="app/view-models/' + route.path + '-viewmodel.js"></script>';
         });
         document.write(includes);
     };
     self.loadViewModels();
+    
 
     //************************************************
     // Current User Management
@@ -68,9 +90,9 @@
     self.loadPage = function (path, state, securedPage) {
 
         //Set current Path
-        path = path ? path : homePath;
+        path = path ? path : AppSettings.defaultRoute;
         if (securedPage == true) {
-            path = (self.getCurrentUser() != null) ? path : loginPath;
+            path = (self.getCurrentUser() != null) ? path : AppSettings.securedRedirect;
         }
         $SET("@p", path, { defer: true });
 
@@ -143,9 +165,9 @@
         self.currentPageState = state;
 
         if (!page) {
-            self.loadPage(homePath, state);
+            self.loadPage(AppSettings.defaultRoute, state);
         } else if (self.currentPath != page) {
-            var navigationEntry = _.findWhere(appRoutes, { path: page });
+            var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: page });
             self.loadTemplates(navigationEntry.templates).then(function () {
                 self.loadPageHtml(navigationEntry);
             });
@@ -177,6 +199,11 @@
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);
         ko.applyBindings(new vModel(), $ContentWindow[0]);
+        
+        //Fills viewmodels with any fields auto filled by browser
+        setTimeout(function () {
+            $('input').trigger('change');
+        }, 250);
     };
 
     //************************************************

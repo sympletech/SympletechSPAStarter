@@ -1,10 +1,7 @@
 var Core = new (function () {
     var self = this;
 
-    var $ContentWindow = $("#content-window"),
-        loginPath = 'login',
-        homePath = 'home';
-
+    var $ContentWindow = $("#content-window");
     $c.DEBUG_MODE = false;
 
     //************************************************
@@ -58,22 +55,19 @@ var Core = new (function () {
         $.cookie(authCookieName, self.currentUser, { expires: expires });
 
         //Check to see if there was a redirect 
-        self.loadPage(homePath);
+        self.loadPage(AppSettings.defaultRoute);
     };
 
     self.logoutUser = function () {
         self.currentUser = null;
         $.removeCookie(authCookieName);
 
-        self.loadPage(loginPath);
+        self.loadPage(AppSettings.securedRedirect);
     };
 
     self.getCurrentUser = function () {
-        if (self.currentUser != null) {
-            return self.currentUser;
-        } else {
-            return $.cookie(authCookieName);
-        }
+        self.currentUser = self.currentUser ? self.currentUser : $.cookie(authCookieName);
+        return self.currentUser;
     };
 
     //************************************************
@@ -150,6 +144,8 @@ var Core = new (function () {
     self.loadPageFromCurrentUrl = function () {
         var page = $GET('p');
         var state = $GET('s');
+
+        self.getCurrentUser();
 
         if (state) {
             try {

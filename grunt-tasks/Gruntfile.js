@@ -26,8 +26,6 @@ module.exports = function(grunt) {
   
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-compass');
-	grunt.loadNpmTasks('grunt-exec');
-	grunt.loadNpmTasks('grunt-contrib-copy');
 
 	// Default task(s).
 	grunt.registerTask('default', ['watch']);

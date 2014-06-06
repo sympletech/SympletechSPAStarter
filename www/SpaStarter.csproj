@@ -63,7 +63,6 @@
     <Content Include="app-settings.js" />
     <Content Include="app\templates\login-template.html" />
     <Content Include="app\view-models\home-viewmodel.js" />
-    <Content Include="app\view-models\_globalViewModel.js" />
     <Content Include="app\views\home.html" />
     <Content Include="app\views\login.html" />
     <Content Include="css\app.css" />
@@ -122,9 +121,7 @@
   <ItemGroup>
     <Content Include="app\view-models\login-viewmodel.js" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="app\views\jade\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -174,7 +174,6 @@ var Core = new (function () {
         }
     };
 
-
     self.loadPageHtml = function (navigationEntry) {
         //Load the page
         $.get("app/views/" + navigationEntry.path + ".html", function (data) {
@@ -187,12 +186,9 @@ var Core = new (function () {
                 self.bindViewModel(vModel);
             }
 
-            var pageTitle = globalViewModel.basePageTitle + " - " + navigationEntry.title;
-            globalViewModel.pageTitle(pageTitle);
+            document.title = AppSettings.applicationTitle + " - " + navigationEntry.title;
+            $("#panel-title").html(navigationEntry.title);
 
-            _.each(globalViewModel.navigation(), function (navEntry) {
-                navEntry.active(navEntry.path == navigationEntry.path);
-            });
         });
     };
 
@@ -286,3 +282,6 @@ var Core = new (function () {
 
     return self;
 })();
+$(function () {
+    Core.loadPageFromCurrentUrl();
+});

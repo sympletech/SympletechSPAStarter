@@ -1,6 +1,8 @@
 var AppSettings = (function() {
     var self = this;
-    
+
+    self.applicationTitle = "Sympletech SPA Starter";
+
     self.defaultEnvironment = 'dev';
     self.environments = [
         {
@@ -26,7 +28,7 @@ var AppSettings = (function() {
         {
             path: 'home',
             text: 'Home Page',
-            title: 'SPA Starter'
+            title: 'Home Page'
         },
         {
             path: 'login',

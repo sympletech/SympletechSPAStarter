@@ -63,8 +63,10 @@
     <Content Include="app-settings.js" />
     <Content Include="app\templates\login-template.html" />
     <Content Include="app\view-models\home-viewmodel.js" />
+    <Content Include="app\view-models\secure-viewmodel.js" />
     <Content Include="app\views\home.html" />
     <Content Include="app\views\login.html" />
+    <Content Include="app\views\secure.html" />
     <Content Include="css\app.css" />
     <Content Include="img\loader-thingy.gif" />
     <Content Include="index.html" />

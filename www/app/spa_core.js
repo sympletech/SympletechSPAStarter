@@ -10,7 +10,7 @@ var Core = new (function () {
     self.activeEnvironment = null;
     self.loadActiveEnvironment = function(){
         
-        var activeEnvironment = _.find(AppSettings.environments, function (env) {
+        var environment = _.find(AppSettings.environments, function (env) {
             return env.hostnames.contains(location.hostname);
         });
 
@@ -19,10 +19,10 @@ var Core = new (function () {
             AppSettings.defaultEnvironment = env;
         }           
 
-        if (activeEnvironment == null || env) {
-            activeEnvironment = _.findWhere(environments, { name: defaultEnvironment });
+        if (environment == null || env) {
+            environment = _.findWhere(environments, { name: defaultEnvironment });
         }
-        self.activeEnvironment = activeEnvironment;
+        self.activeEnvironment = environment;
     };
     self.loadActiveEnvironment();
     
@@ -56,14 +56,22 @@ var Core = new (function () {
         $.cookie(authCookieName, self.currentUser, { expires: expires });
 
         //Check to see if there was a redirect 
-        self.loadPage(AppSettings.defaultRoute);
+        var target = AppSettings.defaultRoute;
+        if (self.currentPageState && self.currentPageState.returnPath) {
+            target = self.currentPageState.returnPath;
+        }
+
+        self.clearPageState();
+
+        self.loadPage(target);
     };
 
     self.logoutUser = function () {
         self.currentUser = null;
         $.removeCookie(authCookieName);
 
-        window.location.href = window.location.href.split('#')[0];
+        var target = window.location.href.split('#')[0];
+        window.location.href = target;
     };
 
     self.getCurrentUser = function () {
@@ -90,6 +98,28 @@ var Core = new (function () {
         $COMMIT();
     };
 
+    self.loadPageState = function () {
+        var state = $GET('s');
+        if (state) {
+            try {
+                state = unescape(state);
+                self.currentPageState = JSON.parse(state);
+            } catch (e) {
+            }
+        }
+    };
+    
+    self.setPageState = function (pageState, defer) {
+        if (pageState) {
+            self.currentPageState = $.extend(self.currentPageState, pageState);
+            $SET("@s", encodeURI(JSON.stringify(self.currentPageState)), { defer: defer });
+        }
+    };
+
+    self.clearPageState = function () {
+        $DEL("s");
+    };
+
     var templateContainer = $("#template-container");
     self.loadTemplates = function (templates) {
         var deferred = Q.defer();
@@ -113,25 +143,13 @@ var Core = new (function () {
     self.getTemplate = function (template) {
         var d = Q.defer();
 
-        $.get('app/templates/' + template + '.html', function (data) {
+        var templatePath = 'app/templates/' + template + '.html?z=' + new Date().getTime();
+
+        $.get(templatePath, function (data) {
             templateContainer.append(data);
             d.resolve(template);
         });
         return d.promise;
-    };
-
-    self.setPageState = function (pageState, defer) {
-        if (pageState) {
-            $SET("@s", encodeURI(JSON.stringify(pageState)), { defer: defer });
-        } else {
-            $DEL("s");
-        }
-        self.currentPageState = pageState;
-    };
-
-    self.updatePageState = function (updatedPageState) {
-        var pageState = $.extend(self.currentPageState, updatedPageState);
-        self.setPageState(pageState);
     };
 
     $(window).on('hashchange', function () {
@@ -141,40 +159,32 @@ var Core = new (function () {
     //Load the current url 
     self.loadPageFromCurrentUrl = function () {
         var page = $GET('p');
-        var state = $GET('s');
 
         self.getCurrentUser();
-
-        if (state) {
-            try {
-                state = unescape(state);
-                state = JSON.parse(state);
-            } catch (e) {
-            }
-        }
-
-        self.currentPageState = state;
+        self.loadPageState();
 
         if (!page) {
-            self.loadPage(AppSettings.defaultRoute, state);
+            self.loadPage(AppSettings.defaultRoute, self.currentPageState);
         } else if (self.currentPath != page) {
+
             var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: page });
 
             if (navigationEntry.secure && self.currentUser == null) {
-                self.loadPage(AppSettings.securedRedirect);
+                
+                self.loadPage(AppSettings.securedRedirect, { returnPath: page });
             } else {
                 self.loadTemplates(navigationEntry.templates).then(function() {
                     self.loadPageHtml(navigationEntry);
                 });
             }
-
-
         }
     };
 
     self.loadPageHtml = function (navigationEntry) {
         //Load the page
-        $.get("app/views/" + navigationEntry.path + ".html", function (data) {
+        var htmlPath = 'app/views/' + navigationEntry.path + '.html?z=' + new Date().getTime();
+
+        $.get(htmlPath, function (data) {
             self.currentPath = navigationEntry.path;
             $ContentWindow.html(data);
 

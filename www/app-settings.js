@@ -26,6 +26,16 @@ var AppSettings = (function() {
     ];
     
     //************************************************
+    // Libraries
+    //************************************************  
+    self.libs = [
+        "lib/bootstrap/js/bootstrap.min.js",
+        "lib/greensock/TweenMax.min.js",
+        "lib/greensock/jquery.gsap.min.js",
+	    "lib/knockout-view-model/knockout.viewmodel.min.js"
+    ];
+    
+    //************************************************
     // Routes
     //************************************************   
     self.defaultRoute = 'home';
@@ -38,6 +48,7 @@ var AppSettings = (function() {
         {
             path: 'login',
             title: 'Login Page',
+            scripts: ['app/view-models/login/extra-login-script.js'],
             templates: ['login-template']
         },
         {

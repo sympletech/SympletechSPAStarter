@@ -17,7 +17,7 @@ var Core = new (function () {
         var env = $GET('env');
         if (env) {
             AppSettings.defaultEnvironment = env;
-        }           
+        }
 
         if (environment == null || env) {
             environment = _.findWhere(environments, { name: defaultEnvironment });
@@ -175,7 +175,7 @@ var Core = new (function () {
     self.getTemplate = function (template) {
         var d = Q.defer();
 
-        var templatePath = 'app/templates/' + template + '.html?z=' + new Date().getTime();
+        var templatePath = 'app/views/templates/' + template + '.html?z=' + new Date().getTime();
 
         $.get(templatePath, function (data) {
             templateContainer.append(data);

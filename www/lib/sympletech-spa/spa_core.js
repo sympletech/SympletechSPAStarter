@@ -8,9 +8,9 @@ var Core = new (function () {
     // Active Environment
     //************************************************    
     self.activeEnvironment = null;
-    self.loadActiveEnvironment = function(){
-        
-        var environment = _.find(AppSettings.environments, function (env) {
+    self.loadActiveEnvironment = function() {
+
+        var environment = _.find(AppSettings.environments, function(env) {
             return env.hostnames.contains(location.hostname);
         });
 
@@ -23,20 +23,45 @@ var Core = new (function () {
             environment = _.findWhere(environments, { name: defaultEnvironment });
         }
         self.activeEnvironment = environment;
+
+        var includes = '';
+        for (var i = 0; i < AppSettings.appRoutes.length; i++) {
+            var route = AppSettings.appRoutes[i];
+            includes += self.loadViewModel(route.path);
+            includes += self.loadStyles(route.styles);
+            includes += self.loadScripts(route.scripts);
+        }
+        document.write(includes);
     };
-    self.loadActiveEnvironment();
     
     //************************************************
     // ViewModel Loads
     //************************************************
-    self.loadViewModels = function () {
-        var includes = '';
-        _.each(AppSettings.appRoutes, function (route) {
-            includes += '<script type="text/javascript" src="app/view-models/' + route.path + '-viewmodel.js"></script>';
-        });
-        document.write(includes);
+    self.loadViewModel = function(path) {
+        return '<script type="text/javascript" src="app/view-models/' + path + '-viewmodel.js"></script>';
     };
-    self.loadViewModels();
+    
+    self.loadStyles = function (styles) {
+        var cssInclude = '';
+        if (styles) {
+            for (var i = 0; i < styles.length; i++) {
+                var style = styles[i];
+                cssInclude += '<link href="' + style + '" rel="stylesheet" type="text/css" />';
+            }
+        }
+        return cssInclude;
+    };
+
+    self.loadScripts = function (scripts) {
+        var jsInclude = '';
+        if (scripts) {
+            for (var i = 0; i < scripts.length; i++) {
+                var script = scripts[i];
+                jsInclude += '<script type="text/javascript" src="' + script + '"></script>';
+            }
+        }
+        return jsInclude;
+    };
     
 
     //************************************************
@@ -121,42 +146,6 @@ var Core = new (function () {
         $DEL("s");
     };
 
-    self.loadStyles = function (styles) {
-        if (styles) {
-            var containerId = "styles-container";
-            var stylesContainer = $('#' + containerId);
-            if (stylesContainer.length == 0) {
-                $('body').append('<div id="' + containerId + '"></div>');
-                stylesContainer = $('#' + containerId);
-            }
-            
-            var cssInclude = '';
-            for (var i = 0; i < styles.length; i++) {
-                var style = styles[i];
-                cssInclude += '<link href="' + style + '" rel="stylesheet" type="text/css" />';
-            }
-            stylesContainer.html(cssInclude);
-        }
-    };
-
-    self.loadScripts = function (scripts) {
-        if (scripts) {
-            var containerId = "scripts-container";
-            var scriptsContainer = $('#' + containerId);
-            if (scriptsContainer.length == 0) {
-                $('body').append('<div id="' + containerId + '"></div>');
-                scriptsContainer = $('#' + containerId);
-            }
-
-            var jsInclude = '';
-            for (var i = 0; i < scripts.length; i++) {
-                var script = scripts[i];
-                jsInclude += '<script type="text/javascript" src="' + script + '"></script>';
-            }
-            scriptsContainer.html(jsInclude);
-        }
-    };
-
     var templateContainer;
     self.loadTemplates = function (templates) {
         var deferred = Q.defer();
@@ -215,8 +204,6 @@ var Core = new (function () {
             if (navigationEntry.secure && self.currentUser == null) {
                 self.loadPage(AppSettings.securedRedirect, { returnPath: page });
             } else {
-                self.loadStyles(navigationEntry.styles);
-                self.loadScripts(navigationEntry.scripts);
                 self.loadTemplates(navigationEntry.templates).then(function() {
                     self.loadPageHtml(navigationEntry);
                 });
@@ -363,6 +350,7 @@ var Core = new (function () {
             }
             scriptsContainer.html(jsInclude);
         }
+        self.loadActiveEnvironment();
     };
     self.init();
 

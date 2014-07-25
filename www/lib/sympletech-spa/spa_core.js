@@ -8,8 +8,8 @@ var Core = new (function () {
     // Active Environment
     //************************************************    
     self.activeEnvironment = null;
-    self.loadActiveEnvironment = function () {
-
+    self.loadActiveEnvironment = function(){
+        
         var environment = _.find(AppSettings.environments, function (env) {
             return env.hostnames.contains(location.hostname);
         });
@@ -17,7 +17,7 @@ var Core = new (function () {
         var env = $GET('env');
         if (env) {
             AppSettings.defaultEnvironment = env;
-        }
+        }           
 
         if (environment == null || env) {
             environment = _.findWhere(environments, { name: defaultEnvironment });
@@ -25,7 +25,7 @@ var Core = new (function () {
         self.activeEnvironment = environment;
     };
     self.loadActiveEnvironment();
-
+    
     //************************************************
     // ViewModel Loads
     //************************************************
@@ -37,7 +37,7 @@ var Core = new (function () {
         document.write(includes);
     };
     self.loadViewModels();
-
+    
 
     //************************************************
     // Current User Management
@@ -109,7 +109,7 @@ var Core = new (function () {
             }
         }
     };
-
+    
     self.setPageState = function (pageState, defer) {
         if (pageState) {
             self.currentPageState = $.extend(self.currentPageState, pageState);
@@ -119,6 +119,24 @@ var Core = new (function () {
 
     self.clearPageState = function () {
         $DEL("s");
+    };
+
+    self.loadStyles = function (styles) {
+        if (styles) {
+            var containerId = "styles-container";
+            var stylesContainer = $('#' + containerId);
+            if (stylesContainer.length == 0) {
+                $('body').append('<div id="' + containerId + '"></div>');
+                stylesContainer = $('#' + containerId);
+            }
+            
+            var cssInclude = '';
+            for (var i = 0; i < styles.length; i++) {
+                var style = styles[i];
+                cssInclude += '<link href="' + style + '" rel="stylesheet" type="text/css" />';
+            }
+            stylesContainer.html(cssInclude);
+        }
     };
 
     self.loadScripts = function (scripts) {
@@ -142,7 +160,7 @@ var Core = new (function () {
     var templateContainer;
     self.loadTemplates = function (templates) {
         var deferred = Q.defer();
-
+        
         var containerId = "template-container";
         templateContainer = $('#' + containerId);
         if (templateContainer.length == 0) {
@@ -197,8 +215,9 @@ var Core = new (function () {
             if (navigationEntry.secure && self.currentUser == null) {
                 self.loadPage(AppSettings.securedRedirect, { returnPath: page });
             } else {
+                self.loadStyles(navigationEntry.styles);
                 self.loadScripts(navigationEntry.scripts);
-                self.loadTemplates(navigationEntry.templates).then(function () {
+                self.loadTemplates(navigationEntry.templates).then(function() {
                     self.loadPageHtml(navigationEntry);
                 });
             }
@@ -233,7 +252,7 @@ var Core = new (function () {
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);
         ko.applyBindings(new vModel(), $ContentWindow[0]);
-
+        
         //Fills viewmodels with any fields auto filled by browser
         setTimeout(function () {
             $('input').trigger('change');
@@ -272,7 +291,7 @@ var Core = new (function () {
 
     self.apiAjaxRequest = function (method, endpoint, params, onSuccess, onFail) {
         self.showLoader();
-
+        
         self.currentUser = self.getCurrentUser();
         if (self.currentUser) {
             params = $.extend({ token: self.currentUser.token }, params);
@@ -288,21 +307,25 @@ var Core = new (function () {
         }
 
         requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';
-        requestPath += 'z=' + new Date().getTime();
-
+        requestPath += 'z=' + new Date().getTime();		
+		
         $.ajax({
             url: requestPath,
             type: method,
             data: params,
             success: function (data) {
-                if (data.success == true) {
-                    if (onSuccess) {
-                        onSuccess(data.data);
-                    }
+                if (data.success == null) {
+                    onSuccess(data);
                 } else {
-                    logit("Error : " + data.errorMessage);
-                    if (onFail) {
-                        onFail(data.errorMessage);
+                    if (data.success == true) {
+                        if (onSuccess) {
+                            onSuccess(data.data);
+                        }
+                    } else {
+                        logit("Error : " + data.errorMessage);
+                        if (onFail) {
+                            onFail(data.errorMessage);
+                        }
                     }
                 }
                 self.hideLoader();
@@ -312,9 +335,9 @@ var Core = new (function () {
                     self.loadPage(loginPath);
                 } else {
                     logit("Error : " + errorThrown);
-                    if (onFail) {
-                        onFail(errorThrown);
-                    }
+					if(onFail){
+						onFail(errorThrown);
+					}
                 }
                 self.hideLoader();
             }

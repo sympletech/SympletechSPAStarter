@@ -336,19 +336,12 @@ var Core = new (function () {
     //************************************************ 
     self.init = function () {
         if (AppSettings.libs) {
-            var containerId = "global-scripts-container";
-            var scriptsContainer = $('#' + containerId);
-            if (scriptsContainer.length == 0) {
-                $('body').append('<div id="' + containerId + '"></div>');
-                scriptsContainer = $('#' + containerId);
-            }
-
             var jsInclude = '';
             for (var i = 0; i < AppSettings.libs.length; i++) {
                 var script = AppSettings.libs[i];
                 jsInclude += '<script type="text/javascript" src="' + script + '"></script>';
             }
-            scriptsContainer.html(jsInclude);
+            document.write(jsInclude);
         }
         self.loadActiveEnvironment();
     };

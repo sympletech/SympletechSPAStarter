@@ -238,7 +238,8 @@ var Core = new (function () {
 
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);
-        ko.applyBindings(new vModel(), $ContentWindow[0]);
+        window.currentViewModel = new vModel();
+        ko.applyBindings(window.currentViewModel, $ContentWindow[0]);
         
         //Fills viewmodels with any fields auto filled by browser
         setTimeout(function () {

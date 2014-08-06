@@ -310,9 +310,10 @@ var Core = new (function () {
                             onSuccess(data.data);
                         }
                     } else {
-                        logit("Error : " + data.errorMessage);
                         if (onFail) {
                             onFail(data.errorMessage);
+                        } else {
+                            alert("Error : " + data.errorMessage);
                         }
                     }
                 }
@@ -320,12 +321,14 @@ var Core = new (function () {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 403) {
-                    self.loadPage(loginPath);
+                    alert('You do not have permission to complete the requested opertation.  Redirecting to login page');
+                    self.loadPage(AppSettings.securedRedirect);
                 } else {
-                    logit("Error : " + errorThrown);
-					if(onFail){
-						onFail(errorThrown);
-					}
+                    if (onFail) {
+                        onFail(errorThrown);
+                    } else {
+                        alert("Error : " + errorThrown);
+                    }
                 }
                 self.hideLoader();
             }

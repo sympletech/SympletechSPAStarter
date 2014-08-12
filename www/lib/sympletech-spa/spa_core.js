@@ -152,7 +152,9 @@ var Core = new (function () {
     };
 
     self.loadPageState = function () {
-        self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
+        if (window.location.hash != '') {
+            self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
+        }
     };
 
     //************************************************

@@ -137,6 +137,10 @@ var Core = new (function () {
         }
     };
 
+    self.getPageState = function () {
+        return self.currentRoute.state;
+    };
+
     self.clearPageState = function () {
         self.currentRoute.state = null;
         self.currentPageState = null;

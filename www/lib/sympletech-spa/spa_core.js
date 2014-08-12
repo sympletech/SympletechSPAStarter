@@ -2,7 +2,6 @@ var Core = new (function () {
     var self = this;
 
     var $ContentWindow = $("#content-window");
-    $c.DEBUG_MODE = false;
 
     //************************************************
     // Active Environment
@@ -10,11 +9,14 @@ var Core = new (function () {
     self.activeEnvironment = null;
     self.loadActiveEnvironment = function() {
 
-        var environment = _.find(AppSettings.environments, function(env) {
-            return env.hostnames.contains(location.hostname);
+        var environment = _.find(AppSettings.environments, function (env) {
+            var inHostList = _.find(env.hostnames, function (hostName) {
+                return hostName.toLowerCase() == location.hostname.toLowerCase();
+            });
+            return inHostList != null;
         });
 
-        var env = $GET('env');
+        var env = self.readQueryString('env');
         if (env) {
             AppSettings.defaultEnvironment = env;
         }
@@ -105,8 +107,13 @@ var Core = new (function () {
     };
 
     //************************************************
-    // Page Loading and Page State
+    // Hash Processing
     //************************************************
+
+    self.currentRoute = {
+        path: '',
+        state : {}
+    };
 
     self.currentPath = null;
     self.currentPageState = null;
@@ -114,42 +121,101 @@ var Core = new (function () {
 
     //Loads Specified path's content into Content Window protects paths if no user is logged in
     self.loadPage = function (path, state) {
-
-        //Set current Path
-        path = path ? path : AppSettings.defaultRoute;
-        $SET("@p", path, { defer: true });
-
-        self.setPageState(state, true);
-
-        $COMMIT();
+        self.currentRoute = {
+            path: path,
+            state: state
+        };
+        
+        self.writeCurrentRoute();
     };
 
-    self.loadPageState = function () {
-        var state = $GET('s');
-        if (state) {
-            try {
-                state = unescape(state);
-                self.currentPageState = JSON.parse(state);
-            } catch (e) {
-            }
-        }
-    };
-    
-    self.setPageState = function (pageState, defer) {
+    self.setPageState = function (pageState) {
         if (pageState) {
-            self.currentPageState = $.extend(self.currentPageState, pageState);
-            $SET("@s", encodeURI(JSON.stringify(self.currentPageState)), { defer: defer });
+            self.currentRoute.state = pageState;
+            self.currentPageState = pageState;
+            self.writeCurrentRoute();
         }
     };
 
     self.clearPageState = function () {
-        $DEL("s");
+        self.currentRoute.state = null;
+        self.currentPageState = null;
+        self.writeCurrentRoute();
     };
+
+    self.writeCurrentRoute = function () {
+        if (self.currentRoute.state != null) {
+            window.location.hash = encodeURI(JSON.stringify(self.currentRoute));
+        } else {
+            window.location.hash = encodeURI(JSON.stringify({ path: self.currentRoute.path }));
+        }
+    };
+
+    self.loadPageState = function () {
+        self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
+    };
+
+    //************************************************
+    // Content Loading
+    //************************************************
+    $(window).on('hashchange', function () {
+        self.loadPageFromCurrentUrl();
+    });
+
+    //Load the current url 
+    self.loadPageFromCurrentUrl = function () {
+        self.loadPageState();
+        self.getCurrentUser();
+
+        if (!self.currentRoute.path) {
+            self.loadPage(AppSettings.defaultRoute, self.currentPageState);
+        } else if (self.currentPath != self.currentRoute.path) {
+
+            var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: self.currentRoute.path });
+
+            if (navigationEntry.secure && self.currentUser == null) {
+                self.loadPage(AppSettings.securedRedirect, { returnPath: self.currentRoute.path });
+            } else {
+                self.loadTemplates(navigationEntry.templates).then(function() {
+                    self.loadPageHtml(navigationEntry);
+                });
+            }
+        }
+    };
+
+    self.loadPageHtml = function (navigationEntry) {
+        //Load the page
+        var htmlPath = 'app/views/' + navigationEntry.path + '.html?z=' + new Date().getTime();
+
+        $.get(htmlPath, function (data) {
+            self.currentPath = navigationEntry.path;
+            $ContentWindow.html(data);
+
+            var vModel;
+            eval('vModel = ' + navigationEntry.path + 'ViewModel;');
+            if (vModel) {
+                self.bindViewModel(vModel);
+            }
+
+            document.title = AppSettings.applicationTitle + " - " + navigationEntry.title;
+            $("#panel-title").html(navigationEntry.title);
+
+            if (self.documentReady) {
+                self.documentReady();
+                self.documentReady = null;
+            }
+
+        });
+    };
+    
+    //************************************************
+    // Template Loading
+    //************************************************
 
     var templateContainer;
     self.loadTemplates = function (templates) {
         var deferred = Q.defer();
-        
+
         var containerId = "template-container";
         templateContainer = $('#' + containerId);
         if (templateContainer.length == 0) {
@@ -184,58 +250,6 @@ var Core = new (function () {
         return d.promise;
     };
 
-    $(window).on('hashchange', function () {
-        self.loadPageFromCurrentUrl();
-    });
-
-    //Load the current url 
-    self.loadPageFromCurrentUrl = function () {
-        var page = $GET('p');
-
-        self.getCurrentUser();
-        self.loadPageState();
-
-        if (!page) {
-            self.loadPage(AppSettings.defaultRoute, self.currentPageState);
-        } else if (self.currentPath != page) {
-
-            var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: page });
-
-            if (navigationEntry.secure && self.currentUser == null) {
-                self.loadPage(AppSettings.securedRedirect, { returnPath: page });
-            } else {
-                self.loadTemplates(navigationEntry.templates).then(function() {
-                    self.loadPageHtml(navigationEntry);
-                });
-            }
-        }
-    };
-
-    self.loadPageHtml = function (navigationEntry) {
-        //Load the page
-        var htmlPath = 'app/views/' + navigationEntry.path + '.html?z=' + new Date().getTime();
-
-        $.get(htmlPath, function (data) {
-            self.currentPath = navigationEntry.path;
-            $ContentWindow.html(data);
-
-            var vModel;
-            eval('vModel = ' + navigationEntry.path + 'ViewModel;');
-            if (vModel) {
-                self.bindViewModel(vModel);
-            }
-
-            document.title = AppSettings.applicationTitle + " - " + navigationEntry.title;
-            $("#panel-title").html(navigationEntry.title);
-
-            if (self.documentReady) {
-                self.documentReady();
-                self.documentReady = null;
-            }
-
-        });
-    };
-
     self.bindViewModel = function (vModel) {
         ko.cleanNode($ContentWindow[0]);
         window.currentViewModel = new vModel();
@@ -259,6 +273,15 @@ var Core = new (function () {
         $("#loader").fadeOut();
     };
 
+    //************************************************
+    // Query String Methods
+    //************************************************
+    self.readQueryString = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
 
     //************************************************
     // API Methods

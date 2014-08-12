@@ -4,7 +4,7 @@
 
 (function () {
     var coreScripts = [
-        "jquery-1.11.0.min.js",
+        "jquery-1.11.1.min.js",
         "jquery-migrate-1.2.1.min.js",
         "q.js",
         "jquery.cookie.js",

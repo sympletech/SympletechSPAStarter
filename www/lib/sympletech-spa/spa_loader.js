@@ -8,7 +8,6 @@
         "jquery-migrate-1.2.1.min.js",
         "q.js",
         "jquery.cookie.js",
-        //"craydent-1.7.23.js",
         "underscore-min.js",
         "knockout-3.1.0.js"
     ];

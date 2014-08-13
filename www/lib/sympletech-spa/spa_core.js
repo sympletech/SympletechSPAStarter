@@ -315,9 +315,17 @@ var Core = new (function () {
         }
 
         var requestPath = endpoint;
-        if (self.activeEnvironment.apiUrl) {
-            if (self.activeEnvironment.apiUrl.endsWith("/") && endpoint.startsWith("/")) {
+        if (requestPath.indexOf('http://') == -1 && self.activeEnvironment.apiUrl) {
+
+            var apiUrlEndsWithSlash = self.activeEnvironment.apiUrl.lastIndexOf('/') == self.activeEnvironment.apiUrl.length - 1,
+                endPointStartsWithSlash = endpoint.indexOf('/') == 0;
+
+            if (apiUrlEndsWithSlash && endPointStartsWithSlash) {
                 endpoint = endpoint.substring(1, endpoint.length);
+            }
+
+            if (!apiUrlEndsWithSlash && !endPointStartsWithSlash) {
+                endpoint = '/' + endpoint;
             }
 
             requestPath = self.activeEnvironment.apiUrl + endpoint;

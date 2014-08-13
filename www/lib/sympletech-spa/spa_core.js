@@ -22,7 +22,7 @@ var Core = new (function () {
         }
 
         if (environment == null || env) {
-            environment = _.findWhere(environments, { name: defaultEnvironment });
+            environment = _.findWhere(environments, { name: AppSettings.defaultEnvironment });
         }
         self.activeEnvironment = environment;
 

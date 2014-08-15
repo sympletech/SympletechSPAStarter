@@ -40,17 +40,17 @@ var Core = new (function () {
     // Current User Management
     //************************************************
 
-    self.currentUser = null;
+    self.currentUser = ko.observable(null);
     var authCookieName = (window.location.pathname != '/' ? window.location.pathname : window.location.hostname).replace(/\//g, "!") + '_cookie';
 
     $.cookie.json = true;
     self.loginUser = function (userDetails, rememberUser) {
-        self.currentUser = userDetails;
+        self.currentUser(userDetails);
 
         //Set Current User cookie
         var expires = rememberUser ? 365 : 1;
 
-        $.cookie(authCookieName, self.currentUser, { expires: expires, path: window.location.pathname });
+        $.cookie(authCookieName, self.currentUser(), { expires: expires, path: window.location.pathname });
 
         //Check to see if there was a redirect 
         var target = AppSettings.defaultRoute;
@@ -64,7 +64,7 @@ var Core = new (function () {
     };
 
     self.logoutUser = function () {
-        self.currentUser = null;
+        self.currentUser(null);
         self.currentPath = null;
         
         $.removeCookie(authCookieName, { path: window.location.pathname });
@@ -73,8 +73,8 @@ var Core = new (function () {
     };
 
     self.getCurrentUser = function () {
-        self.currentUser = self.currentUser ? self.currentUser : $.cookie(authCookieName);
-        return self.currentUser;
+        //self.currentUser(self.currentUser() ? self.currentUser() : $.cookie(authCookieName));
+        return self.currentUser();
     };
 
     //************************************************
@@ -219,6 +219,8 @@ var Core = new (function () {
     //************************************************
     // Content Loading
     //************************************************
+    self.currentPage = ko.observable();
+
     $(window).on('hashchange', function () {
         self.loadPageFromCurrentUrl();
     });
@@ -231,7 +233,7 @@ var Core = new (function () {
                 state: null
             };
         } else {
-            if (navigationEntry.secure && self.currentUser == null) {
+            if (navigationEntry.secure && self.currentUser() == null) {
                 self.currentRoute = {
                     path: AppSettings.securedRedirect,
                     state: { returnPath: path }
@@ -258,13 +260,15 @@ var Core = new (function () {
 
             var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: self.currentRoute.path });
 
-            if (navigationEntry.secure && self.currentUser == null) {
-                self.loadPage(AppSettings.securedRedirect, { returnPath: self.currentRoute.path });
-            } else {
-                self.loadTemplates(navigationEntry.templates).then(function() {
-                    self.loadPageHtml(navigationEntry);
-                });
+            if (navigationEntry.secure && self.currentUser() == null) {
+                navigationEntry = _.findWhere(AppSettings.appRoutes, { path: AppSettings.securedRedirect });
+                self.setPageState({ returnPath: self.currentRoute.path });
             }
+            
+            self.currentPage(navigationEntry);
+            self.loadTemplates(navigationEntry.templates).then(function () {
+                self.loadPageHtml(navigationEntry);
+            });
         }
     };
 
@@ -388,9 +392,9 @@ var Core = new (function () {
     self.apiAjaxRequest = function (method, endpoint, params, onSuccess, onFail) {
         self.showLoader();
         
-        self.currentUser = self.getCurrentUser();
-        if (self.currentUser) {
-            params = $.extend({ token: self.currentUser.token }, params);
+        self.getCurrentUser();
+        if (self.currentUser() && self.currentUser().token) {
+            params = $.extend({ token: self.currentUser().token }, params);
         }
 
         var requestPath = endpoint;
@@ -465,6 +469,7 @@ var Core = new (function () {
         }
         self.loadActiveEnvironment();
         self.loadGlobalViewModel();
+        self.currentUser($.cookie(authCookieName));
     };
     self.init();
 

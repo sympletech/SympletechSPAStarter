@@ -41,7 +41,7 @@ var Core = new (function () {
     //************************************************
 
     self.currentUser = null;
-    var authCookieName = "userinfo";
+    var authCookieName = (window.location.pathname != '/' ? window.location.pathname : window.location.hostname).replace(/\//g, "!") + '_cookie';
 
     $.cookie.json = true;
     self.loginUser = function (userDetails, rememberUser) {
@@ -50,7 +50,7 @@ var Core = new (function () {
         //Set Current User cookie
         var expires = rememberUser ? 365 : 1;
 
-        $.cookie(authCookieName, self.currentUser, { expires: expires });
+        $.cookie(authCookieName, self.currentUser, { expires: expires, path: window.location.pathname });
 
         //Check to see if there was a redirect 
         var target = AppSettings.defaultRoute;
@@ -65,10 +65,11 @@ var Core = new (function () {
 
     self.logoutUser = function () {
         self.currentUser = null;
-        $.removeCookie(authCookieName);
-
-        var target = window.location.href.split('#')[0];
-        window.location.href = target;
+        self.currentPath = null;
+        
+        $.removeCookie(authCookieName, { path: window.location.pathname });
+        
+        self.loadPage(AppSettings.defaultRoute, null);
     };
 
     self.getCurrentUser = function () {
@@ -88,16 +89,6 @@ var Core = new (function () {
     self.currentPath = null;
     self.currentPageState = null;
     self.documentReady = null;
-
-    //Loads Specified path's content into Content Window protects paths if no user is logged in
-    self.loadPage = function (path, state) {
-        self.currentRoute = {
-            path: path,
-            state: state
-        };
-        
-        self.writeCurrentRoute();
-    };
 
     self.setPageState = function (pageState) {
         if (pageState) {
@@ -231,6 +222,30 @@ var Core = new (function () {
     $(window).on('hashchange', function () {
         self.loadPageFromCurrentUrl();
     });
+
+    self.loadPage = function (path, state) {
+        var navigationEntry = _.findWhere(AppSettings.appRoutes, { path: path });
+        if (navigationEntry == null) {
+            self.currentRoute = {
+                path: AppSettings.defaultRoute,
+                state: null
+            };
+        } else {
+            if (navigationEntry.secure && self.currentUser == null) {
+                self.currentRoute = {
+                    path: AppSettings.securedRedirect,
+                    state: { returnPath: path }
+                };
+            } else {
+                self.currentRoute = {
+                    path: path,
+                    state: state
+                };
+            }
+        }
+
+        self.writeCurrentRoute();
+    };
 
     //Load the current url 
     self.loadPageFromCurrentUrl = function () {

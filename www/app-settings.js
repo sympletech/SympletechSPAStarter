@@ -1,4 +1,4 @@
-var AppSettings = (function() {
+var AppSettings = new (function () {
     var self = this;
 
     self.applicationTitle = "Sympletech SPA Starter";
@@ -34,7 +34,15 @@ var AppSettings = (function() {
         "lib/greensock/jquery.gsap.min.js",
 	    "lib/knockout-view-model/knockout.viewmodel.min.js"
     ];
-    
+
+    //************************************************
+    // Global View Model
+    //************************************************  
+    self.globalViewModel = {
+        path: 'app/view-models/global-viewmodel',
+        className: 'globalViewModel'
+    };
+
     //************************************************
     // Routes
     //************************************************   

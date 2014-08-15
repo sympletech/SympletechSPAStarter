@@ -29,43 +29,13 @@ var Core = new (function () {
         var includes = '';
         for (var i = 0; i < AppSettings.appRoutes.length; i++) {
             var route = AppSettings.appRoutes[i];
-            includes += self.loadViewModel(route.path);
-            includes += self.loadStyles(route.styles);
-            includes += self.loadScripts(route.scripts);
+            includes += self.composeViewModelScriptInclude(route.path);
+            includes += self.composeStyleSheetInclude(route.styles);
+            includes += self.composeScriptsInclude(route.scripts);
         }
         document.write(includes);
     };
     
-    //************************************************
-    // ViewModel Loads
-    //************************************************
-    self.loadViewModel = function(path) {
-        return '<script type="text/javascript" src="app/view-models/' + path + '-viewmodel.js"></script>';
-    };
-    
-    self.loadStyles = function (styles) {
-        var cssInclude = '';
-        if (styles) {
-            for (var i = 0; i < styles.length; i++) {
-                var style = styles[i];
-                cssInclude += '<link href="' + style + '" rel="stylesheet" type="text/css" />';
-            }
-        }
-        return cssInclude;
-    };
-
-    self.loadScripts = function (scripts) {
-        var jsInclude = '';
-        if (scripts) {
-            for (var i = 0; i < scripts.length; i++) {
-                var script = scripts[i];
-                jsInclude += '<script type="text/javascript" src="' + script + '"></script>';
-            }
-        }
-        return jsInclude;
-    };
-    
-
     //************************************************
     // Current User Management
     //************************************************
@@ -158,6 +128,100 @@ var Core = new (function () {
     self.loadPageState = function () {
         if (window.location.hash != '') {
             self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
+        }
+    };
+
+    //************************************************
+    // Resource Include Composition
+    //************************************************
+    function endsWith(str, suffix) {
+        return str.toLowerCase().indexOf(suffix.toLowerCase(), str.length - suffix.length) !== -1;
+    }    
+
+    var includeScriptHtml = function (path) {
+        if (endsWith(path, '.js') != true) {
+            path = path + '.js';
+        }
+
+        return '<script type="text/javascript" src="' + path + '"></script>';
+    };
+
+    var includeStyleSheetHtml = function (path) {
+        if (endsWith(path, '.css') != true) {
+            path = path + '.css';
+        }
+        return '<link href="' + path + '" rel="stylesheet" type="text/css" />';
+    };
+
+    self.composeViewModelScriptInclude = function (path) {
+        return includeScriptHtml("app/view-models/" + path + "-viewmodel.js");
+    };
+
+    self.composeStyleSheetInclude = function (styles) {
+        var cssInclude = '';
+        if (styles) {
+            for (var i = 0; i < styles.length; i++) {
+                var style = styles[i];
+                cssInclude += includeStyleSheetHtml(style);
+            }
+        }
+        return cssInclude;
+    };
+
+    self.composeScriptsInclude = function (scripts) {
+        var jsInclude = '';
+        if (scripts) {
+            for (var i = 0; i < scripts.length; i++) {
+                var script = scripts[i];
+                jsInclude += includeScriptHtml(script);
+            }
+        }
+        return jsInclude;
+    };
+
+    //************************************************
+    // Global View Model
+    //************************************************
+    self.globalViewModel = {};
+
+    var partialBindingProvider = function () {
+        var result = new ko.bindingProvider(),
+            originalHasBindings = result.nodeHasBindings;
+
+        result.exclusionSelector = '#content-window';
+
+        result.nodeHasBindings = function (node) {
+            return !$(node).is(result.exclusionSelector) && originalHasBindings.call(this, node);
+        };
+
+        return result;
+    };
+
+    function instantiateGlobalViewModel() {
+        try {
+            var gblVm = eval('new ' + AppSettings.globalViewModel.className + '();');
+        } catch(e) {}
+
+        if (gblVm) {
+            ko.bindingProvider.instance = new partialBindingProvider();
+            
+            self.globalViewModel = gblVm;
+            ko.applyBindings(self.globalViewModel);
+
+            ko.bindingProvider.instance = new ko.bindingProvider();
+        } else {
+            setTimeout(function() {
+                instantiateGlobalViewModel();
+            }, 100);
+        }
+    }
+
+    self.loadGlobalViewModel = function () {
+        if (AppSettings.globalViewModel) {
+            var gblVmInclude = includeScriptHtml(AppSettings.globalViewModel.path);
+            document.write(gblVmInclude);
+
+            instantiateGlobalViewModel();
         }
     };
 
@@ -385,6 +449,7 @@ var Core = new (function () {
             document.write(jsInclude);
         }
         self.loadActiveEnvironment();
+        self.loadGlobalViewModel();
     };
     self.init();
 

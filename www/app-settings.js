@@ -49,7 +49,7 @@ var AppSettings = (function() {
             path: 'login',
             title: 'Login Page',
             scripts: ['app/view-models/login/extra-login-script.js'],
-            templates: ['login-template']
+            templates: ['app/views/templates/login-template']
         },
         {
             path: 'secure',

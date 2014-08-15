@@ -247,7 +247,7 @@ var Core = new (function () {
     self.getTemplate = function (template) {
         var d = Q.defer();
 
-        var templatePath = 'app/views/templates/' + template + '.html?z=' + new Date().getTime();
+        var templatePath = template + '.html?z=' + new Date().getTime();
 
         $.get(templatePath, function (data) {
             templateContainer.append(data);

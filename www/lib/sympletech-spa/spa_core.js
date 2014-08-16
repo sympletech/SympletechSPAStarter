@@ -119,6 +119,7 @@ var Core = new (function () {
     self.loadPageState = function () {
         if (window.location.hash != '') {
             self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
+            self.setPageState(self.currentRoute.state);
         }
     };
 
@@ -245,7 +246,7 @@ var Core = new (function () {
                 };
             }
         }
-
+        self.setPageState(state);
         self.writeCurrentRoute();
     };
 

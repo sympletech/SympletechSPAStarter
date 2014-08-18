@@ -56,14 +56,15 @@ var Core = new (function () {
         $.cookie(authCookieName, self.currentUser(), { expires: expires, path: window.location.pathname });
 
         //Check to see if there was a redirect 
-        var target = AppSettings.defaultRoute;
-        if (self.currentPageState && self.currentPageState.returnPath) {
-            target = self.currentPageState.returnPath;
+        var target = AppSettings.defaultRoute,
+            targetState = null;
+        
+        if (self.currentPageState && self.currentPageState.returnTo) {
+            target = self.currentPageState.returnTo.path;
+            targetState = self.currentPageState.returnTo.state;
         }
 
-        self.clearPageState();
-
-        self.loadPage(target);
+        self.loadPage(target, targetState);
     };
 
     self.logoutUser = function () {
@@ -76,7 +77,6 @@ var Core = new (function () {
     };
 
     self.getCurrentUser = function () {
-        //self.currentUser(self.currentUser() ? self.currentUser() : $.cookie(authCookieName));
         return self.currentUser();
     };
 
@@ -240,7 +240,12 @@ var Core = new (function () {
             if (navigationEntry.secure && self.currentUser() == null) {
                 self.currentRoute = {
                     path: AppSettings.securedRedirect,
-                    state: { returnPath: path }
+                    state: {
+                        returnTo: {                        
+                            path: path,
+                            state : state 
+                        }
+                    }
                 };
             } else {
                 self.currentRoute = {
@@ -446,7 +451,7 @@ var Core = new (function () {
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 403) {
                     alert('You do not have permission to complete the requested opertation.  Redirecting to login page');
-                    self.loadPage(AppSettings.securedRedirect);
+                    self.loadPage(AppSettings.securedRedirect, { returnTo: self.currentRoute });
                 } else {
                     if (onFail) {
                         onFail(errorThrown);
@@ -454,7 +459,7 @@ var Core = new (function () {
                         alert("Error : " + errorThrown);
                     }
                 }
-                self.hideLoader();
+                self.hideLoader(); 
             }
         });
     };

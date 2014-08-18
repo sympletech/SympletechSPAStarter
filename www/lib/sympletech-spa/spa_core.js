@@ -19,10 +19,13 @@ var Core = new (function () {
         var env = self.readQueryString('env');
         if (env) {
             AppSettings.defaultEnvironment = env;
-        }
-
+        } 
+ 
         if (environment == null || env) {
-            environment = _.findWhere(environments, { name: AppSettings.defaultEnvironment });
+            environment = _.findWhere(AppSettings.environments, { name: AppSettings.defaultEnvironment });
+        }
+        if (environment == null) {
+            environment = AppSettings.environments[0];
         }
         self.activeEnvironment = environment;
 

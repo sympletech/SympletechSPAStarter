@@ -450,7 +450,6 @@ var Core = new (function () {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 403) {
-                    alert('You do not have permission to complete the requested opertation.  Redirecting to login page');
                     self.loadPage(AppSettings.securedRedirect, { returnTo: self.currentRoute });
                 } else {
                     if (onFail) {

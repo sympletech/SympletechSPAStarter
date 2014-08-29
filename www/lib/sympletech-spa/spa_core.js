@@ -400,12 +400,26 @@ var Core = new (function () {
 
     self.apiAjaxRequest = function (method, endpoint, params, onSuccess, onFail) {
         self.showLoader();
+        params = addSessionIdToParams(params);
+        var requestPath = prepareRequestPath(endpoint);
+
+        if (self.detectCORSSupport()) {
+            makeAjaxCall(requestPath, params, method, onSuccess, onFail);
+        } else {
+            makeJSONPCall(requestPath, params, method, onSuccess, onFail);
+        }
         
+    };
+
+    function addSessionIdToParams(params) {
         self.getCurrentUser();
         if (self.currentUser() && self.currentUser().token) {
             params = $.extend({ token: self.currentUser().token }, params);
         }
+        return params;
+    }
 
+    function prepareRequestPath(endpoint) {
         var requestPath = endpoint;
         if (requestPath.indexOf('http://') == -1 && self.activeEnvironment.apiUrl) {
 
@@ -424,43 +438,72 @@ var Core = new (function () {
         }
 
         requestPath += (requestPath.indexOf('?') == -1) ? '?' : '&';
-        requestPath += 'z=' + new Date().getTime();		
-		
+        requestPath += 'z=' + new Date().getTime();
+
+        return requestPath;
+    }
+
+    function makeAjaxCall(requestPath, params, method, onSuccess, onFail) {
         $.ajax({
             url: requestPath,
             type: method,
             data: params,
             success: function (data) {
-                if (data.success == null) {
-                    onSuccess(data);
-                } else {
-                    if (data.success == true) {
-                        if (onSuccess) {
-                            onSuccess(data.data);
-                        }
-                    } else {
-                        if (onFail) {
-                            onFail(data.errorMessage);
-                        } else {
-                            alert("Error : " + data.errorMessage);
-                        }
-                    }
-                }
-                self.hideLoader();
+                handleSuccessfullRequest(data, onSuccess, onFail);
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status == 403) {
-                    self.loadPage(AppSettings.securedRedirect, { returnTo: self.currentRoute });
-                } else {
-                    if (onFail) {
-                        onFail(errorThrown);
-                    } else {
-                        alert("Error : " + errorThrown);
-                    }
-                }
-                self.hideLoader(); 
+            error: function (jqXhr, textStatus, errorThrown) {
+                handleUnSuccessfullRequest(jqXhr.status, errorThrown, onFail);
             }
         });
+    }
+
+    function makeJSONPCall(requestPath, params, method, onSuccess, onFail) {
+        $.ajax({
+            url: requestPath,
+            dataType: 'jsonp',
+            data: params,
+            success: function (data) {
+                handleSuccessfullRequest(data, onSuccess, onFail);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                handleUnSuccessfullRequest(jqXhr.status, errorThrown, onFail);
+            }
+        });
+    }
+
+    function handleSuccessfullRequest(data, onSuccess, onFail) {
+        if (data.success == null) {
+            onSuccess(data);
+        } else {
+            if (data.success == true) {
+                if (onSuccess) {
+                    onSuccess(data.data);
+                }
+            } else {
+                handleUnSuccessfullRequest(200, data.errorMessage, onFail);
+            }
+        }
+        self.hideLoader();
+    }
+
+    function handleUnSuccessfullRequest(status, errorThrown, onFail) {
+        if (status == 403) {
+            self.loadPage(AppSettings.securedRedirect, { returnTo: self.currentRoute });
+        } else {
+            if (onFail) {
+                onFail(errorThrown);
+            } else {
+                alert("Error : " + errorThrown);
+            }
+        }
+        self.hideLoader();
+    }
+
+    //************************************************
+    // Helpers
+    //************************************************ 
+    self.detectCORSSupport = function() {
+        return ('withCredentials' in new XMLHttpRequest());
     };
 
     //************************************************

@@ -101,6 +101,11 @@ var Core = new (function () {
         }
     };
 
+    self.updatePageState = function(pageState) {
+        var pState = $.extend(self.currentRoute.state, pageState);
+        self.setPageState(pState);
+    };
+
     self.getPageState = function () {
         return self.currentRoute.state;
     };
@@ -363,12 +368,15 @@ var Core = new (function () {
     // Loader Methods
     //************************************************
 
+    self.loading = false;
     self.showLoader = function () {
         $("#loader").fadeIn();
+        self.loading = true;
     };
 
     self.hideLoader = function () {
         $("#loader").fadeOut();
+        self.loading = false;
     };
 
     //************************************************
@@ -493,7 +501,7 @@ var Core = new (function () {
             if (onFail) {
                 onFail(errorThrown);
             } else {
-                alert("Error : " + errorThrown);
+                //alert("Error : " + errorThrown);
             }
         }
         self.hideLoader();

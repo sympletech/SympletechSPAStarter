@@ -21,7 +21,6 @@
     
     var appIncludes = '<script type="text/javascript" src="app-settings.js"></script>';
     appIncludes += '<script type="text/javascript" src="' + spa_dir + 'spa_core.js"></script>';
-    
+
     document.write(appIncludes);
-    
 })();

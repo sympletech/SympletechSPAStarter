@@ -380,6 +380,17 @@ var Core = new (function () {
     };
 
     //************************************************
+    // Mobile Detect
+    //************************************************
+    self.detectMobileBrowser = function() {
+        if ('ontouchstart' in window || $(window).width() < 720) {
+            $('body').addClass('mobile');
+        } else {
+            $('body').removeClass('mobile');
+        }
+    };
+
+    //************************************************
     // Query String Methods
     //************************************************
     self.readQueryString = function(name) {
@@ -529,6 +540,9 @@ var Core = new (function () {
         self.loadActiveEnvironment();
         self.loadGlobalViewModel();
         self.currentUser($.cookie(authCookieName));
+
+        self.detectMobileBrowser();
+        $(window).resize(self.detectMobileBrowser);
     };
     self.init();
 

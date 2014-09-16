@@ -383,10 +383,17 @@ var Core = new (function () {
     // Mobile Detect
     //************************************************
     self.detectMobileBrowser = function() {
-        if ('ontouchstart' in window || $(window).width() < 720) {
+        if ('ontouchstart' in window || $(window).width() <= 1024) {
             $('body').addClass('mobile');
+            if (window.innerHeight < window.innerWidth) {
+                $('body').addClass('landscape');
+                $('body').removeClass('portrait');
+            } else {
+                $('body').addClass('portrait');
+                $('body').removeClass('landscape');
+            }
         } else {
-            $('body').removeClass('mobile');
+            $('body').removeClass('mobile').removeClass('portrait').removeClass('landscape');
         }
     };
 

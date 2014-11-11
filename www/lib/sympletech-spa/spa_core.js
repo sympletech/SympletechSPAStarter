@@ -94,7 +94,7 @@ var Core = new (function () {
     self.documentReady = null;
 
     self.setPageState = function (pageState) {
-        if (pageState) {
+        if (pageState && self.currentRoute.state != pageState) {
             self.currentRoute.state = pageState;
             self.currentPageState = pageState;
             self.writeCurrentRoute();
@@ -102,7 +102,7 @@ var Core = new (function () {
     };
 
     self.updatePageState = function(pageState) {
-        var pState = $.extend(self.currentRoute.state, pageState);
+        var pState = $.extend({}, self.currentRoute.state, pageState);
         self.setPageState(pState);
     };
 
@@ -117,17 +117,23 @@ var Core = new (function () {
     };
 
     self.writeCurrentRoute = function () {
+
+        var hash = '/' + self.currentRoute.path;
         if (self.currentRoute.state != null) {
-            window.location.hash = encodeURI(JSON.stringify(self.currentRoute));
-        } else {
-            window.location.hash = encodeURI(JSON.stringify({ path: self.currentRoute.path }));
+            hash += '##' + encodeURI(JSON.stringify(self.currentRoute.state));
         }
+        window.location.hash = hash;
     };
 
     self.loadPageState = function () {
         if (window.location.hash != '') {
-            self.currentRoute = JSON.parse(decodeURI(window.location.hash).substring(1));
-            self.setPageState(self.currentRoute.state);
+            var routeParts = window.location.hash.split('##');
+            if (routeParts[0].indexOf('#/') == 0) {
+                self.currentRoute.path = routeParts[0].substring(2, routeParts[0].length);
+            }
+            if (routeParts.length > 1) {
+                self.setPageState(JSON.parse(decodeURI(routeParts[1])));
+            }
         }
     };
 

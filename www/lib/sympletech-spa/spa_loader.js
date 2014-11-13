@@ -4,12 +4,13 @@
 
 (function () {
     var coreScripts = [
-        "jquery-1.11.1.min.js",
-        "jquery-migrate-1.2.1.min.js",
+        "jquery/jquery-1.11.1.min.js",
+        "jquery/jquery-migrate-1.2.1.min.js",
+        "jquery/jquery.cookie.js",
         "q.js",
-        "jquery.cookie.js",
-        "underscore-min.js",
-        "knockout-3.1.0.js"
+        "lodash/lodash.2.4.1.min.js",
+        "ko/knockout-3.2.0.js",
+        "ko/knockout.viewmodel.min.js"
     ];
 
     var coreIncludes = "";
